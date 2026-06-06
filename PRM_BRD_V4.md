@@ -1249,3 +1249,4 @@ The following engineering practices must be reflected in the codebase and explai
 | **Design Principles** | At least two design principles must be applied and documented (e.g. DRY, YAGNI, Separation of Concerns, Fail Fast, Law of Demeter). |
 | **Clean Code**        | Meaningful names, small focused functions, no magic numbers, and no dead or commented-out code.                                     |
 
+
