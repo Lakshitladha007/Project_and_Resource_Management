@@ -1,0 +1,58 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Type checkers / linters
+.mypy_cache/
+.ruff_cache/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Mermaid validation artifacts (throwaway diagram renders)
+design/_*.png
+
+# Logs / local DB dumps
+*.log
+*.sqlite3
+
+# Misc
+class-diagram.md
+er-diagram.md
+ROADMAP_7_DAYS.md
+sequence-diagrams.md
+usecase-diagram.md
+PRM_BRD_V4.md
+PROJECT_CONTEXT.md
+design/README.md
