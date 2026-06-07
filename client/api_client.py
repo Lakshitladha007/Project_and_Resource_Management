@@ -24,10 +24,12 @@ def post(path: str, json: dict, auth: bool = False) -> dict:
     return _handle(resp)
 
 
-def get(path: str, auth: bool = True) -> dict:
+def get(path: str, auth: bool = True, params: dict | None = None):
     headers = _auth_headers() if auth else {}
     try:
-        resp = httpx.get(f"{BASE_URL}{path}", headers=headers, timeout=10)
+        resp = httpx.get(
+            f"{BASE_URL}{path}", headers=headers, params=params, timeout=10
+        )
     except httpx.ConnectError as exc:
         raise ApiError("Cannot reach the server. Is it running on localhost:8000?") from exc
     return _handle(resp)
