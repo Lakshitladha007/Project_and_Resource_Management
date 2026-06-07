@@ -10,3 +10,13 @@ class EmployeeRepository(BaseRepository[Employee]):
 
     def get_by_user_id(self, user_id: int) -> Employee | None:
         return self.db.query(Employee).filter(Employee.user_id == user_id).first()
+
+    def list_by_manager(self, manager_user_id: int) -> list[Employee]:
+        return (
+            self.db.query(Employee)
+            .filter(
+                Employee.manager_id == manager_user_id,
+                Employee.is_active.is_(True),
+            )
+            .all()
+        )

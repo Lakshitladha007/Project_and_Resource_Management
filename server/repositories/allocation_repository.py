@@ -19,3 +19,6 @@ class AllocationRepository(BaseRepository[Allocation]):
         if project_id is not None:
             query = query.filter(Allocation.project_id == project_id)
         return query.order_by(Allocation.alloc_start).all()
+
+    def list_active_for_employee(self, employee_id: int) -> list[Allocation]:
+        return self.list_active(employee_id=employee_id)
