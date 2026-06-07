@@ -42,6 +42,15 @@ def put(path: str, json: dict, auth: bool = True) -> dict:
     return _handle(resp)
 
 
+def delete(path: str, auth: bool = True) -> dict:
+    headers = _auth_headers() if auth else {}
+    try:
+        resp = httpx.delete(f"{BASE_URL}{path}", headers=headers, timeout=10)
+    except httpx.ConnectError as exc:
+        raise ApiError("Cannot reach the server. Is it running on localhost:8000?") from exc
+    return _handle(resp)
+
+
 def _handle(resp: httpx.Response) -> dict:
     if resp.status_code >= 400:
         detail = resp.text

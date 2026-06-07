@@ -2,6 +2,7 @@ import typer
 
 from client import display
 from client.api_client import ApiError, get, post, put
+from client.screens.admin import skills as skills_screen
 
 
 def manage_employees() -> None:
@@ -26,7 +27,7 @@ def manage_employees() -> None:
         elif choice == "3":
             _deactivate_employee()
         elif choice == "4":
-            display.info("Skills management arrives in the next sub-step.")
+            skills_screen.manage_skills()
         elif choice == "5":
             _assign_manager()
         elif choice == "6":
