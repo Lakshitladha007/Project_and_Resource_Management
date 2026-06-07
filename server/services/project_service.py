@@ -6,6 +6,7 @@ from server.core.enums import HealthStatus, Role
 from server.core.exceptions import NotFoundError, ValidationError
 from server.models.project import Project
 from server.repositories.employee_repository import EmployeeRepository
+from server.repositories.milestone_repository import MilestoneRepository
 from server.repositories.project_repository import ProjectRepository
 from server.repositories.user_repository import UserRepository
 
@@ -16,6 +17,7 @@ class ProjectService:
         self.projects = ProjectRepository(db)
         self.users = UserRepository(db)
         self.employees = EmployeeRepository(db)
+        self.milestones = MilestoneRepository(db)
 
     def _manager_name(self, manager_user_id: int) -> str:
         user = self.users.get(manager_user_id)
@@ -46,7 +48,7 @@ class ProjectService:
             "manager_user_id": project.manager_user_id,
             "manager_name": self._manager_name(project.manager_user_id),
             "total_story_points": project.total_story_points,
-            "story_points_done": 0,
+            "story_points_done": self.milestones.sum_done_points(project.id),
             "health_status": project.health_status,
         }
 
