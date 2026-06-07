@@ -10,3 +10,11 @@ class ProjectRepository(BaseRepository[Project]):
 
     def get_by_name(self, name: str) -> Project | None:
         return self.db.query(Project).filter(Project.name == name).first()
+
+    def list_by_manager(self, manager_user_id: int) -> list[Project]:
+        return (
+            self.db.query(Project)
+            .filter(Project.manager_user_id == manager_user_id)
+            .order_by(Project.name)
+            .all()
+        )
