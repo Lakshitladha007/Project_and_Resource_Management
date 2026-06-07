@@ -2,10 +2,11 @@ import typer
 
 from client import display
 from client.screens.admin import employees as employees_screen
+from client.screens.admin import projects as projects_screen
 from client.screens.admin import users as users_screen
 from client.session import session
 
-COMING_SOON = {"2", "3", "5"}
+COMING_SOON = {"3", "5"}
 
 
 def admin_menu() -> None:
@@ -25,6 +26,8 @@ def admin_menu() -> None:
         choice = typer.prompt("Enter option").strip()
         if choice == "1":
             employees_screen.manage_employees()
+        elif choice == "2":
+            projects_screen.manage_projects()
         elif choice == "4":
             users_screen.manage_users()
         elif choice == "6":
