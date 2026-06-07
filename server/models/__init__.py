@@ -1,3 +1,4 @@
+from server.models.allocation import Allocation
 from server.models.employee import Employee
 from server.models.milestone import Milestone
 from server.models.project import Project
@@ -13,4 +14,5 @@ __all__ = [
     "EmployeeSkill",
     "Project",
     "Milestone",
+    "Allocation",
 ]
