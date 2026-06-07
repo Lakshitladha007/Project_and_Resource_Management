@@ -7,6 +7,19 @@ from server.config import settings
 
 _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+MIN_PASSWORD_LENGTH = 8
+
+
+def password_strength_error(password: str) -> str | None:
+    """Return an error message if the password is weak, else None."""
+    if len(password) < MIN_PASSWORD_LENGTH:
+        return f"Password must be at least {MIN_PASSWORD_LENGTH} characters"
+    if not any(c.isupper() for c in password):
+        return "Password must contain at least one uppercase letter"
+    if not any(c.isdigit() for c in password):
+        return "Password must contain at least one number"
+    return None
+
 
 def hash_password(plain: str) -> str:
     return _pwd_context.hash(plain)
