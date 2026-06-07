@@ -2,6 +2,7 @@ import typer
 
 from client import display
 from client.api_client import ApiError, get, post, put
+from client.screens.admin import milestones as milestones_screen
 from client.validators import format_date, parse_date
 
 CREATE_STATUS_MAP = {"1": "PLANNED", "2": "ACTIVE", "3": "ON_HOLD"}
@@ -34,7 +35,7 @@ def manage_projects() -> None:
         elif choice == "3":
             _update_project()
         elif choice == "4":
-            display.info("Milestones arrive in the next sub-step.")
+            milestones_screen.manage_milestones()
         elif choice == "5":
             return
         else:
