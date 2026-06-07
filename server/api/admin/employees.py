@@ -9,7 +9,13 @@ from server.schemas.employee import (
     EmployeeResponse,
     UpdateEmployeeRequest,
 )
+from server.schemas.skill import (
+    AddEmployeeSkillRequest,
+    EmployeeSkillResponse,
+    UpdateProficiencyRequest,
+)
 from server.services.employee_service import EmployeeService
+from server.services.skill_service import SkillService
 
 router = APIRouter(prefix="/admin/employees", tags=["admin-employees"])
 
@@ -63,3 +69,59 @@ def deactivate_employee(
 ) -> dict:
     EmployeeService(db).deactivate_employee(employee_id)
     return {"detail": "Employee deactivated."}
+
+
+@router.get("/{employee_id}/skills", response_model=list[EmployeeSkillResponse])
+def list_employee_skills(
+    employee_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(admin_only),
+) -> list[EmployeeSkillResponse]:
+    return [
+        EmployeeSkillResponse(**row)
+        for row in SkillService(db).list_employee_skills(employee_id)
+    ]
+
+
+@router.post("/{employee_id}/skills", response_model=EmployeeSkillResponse)
+def add_employee_skill(
+    employee_id: int,
+    payload: AddEmployeeSkillRequest,
+    db: Session = Depends(get_db),
+    _: User = Depends(admin_only),
+) -> EmployeeSkillResponse:
+    row = SkillService(db).add_skill(
+        employee_id,
+        payload.skill_name,
+        payload.category.value,
+        payload.proficiency.value,
+    )
+    return EmployeeSkillResponse(**row)
+
+
+@router.put(
+    "/{employee_id}/skills/{employee_skill_id}",
+    response_model=EmployeeSkillResponse,
+)
+def update_employee_skill(
+    employee_id: int,
+    employee_skill_id: int,
+    payload: UpdateProficiencyRequest,
+    db: Session = Depends(get_db),
+    _: User = Depends(admin_only),
+) -> EmployeeSkillResponse:
+    row = SkillService(db).update_proficiency(
+        employee_id, employee_skill_id, payload.proficiency.value
+    )
+    return EmployeeSkillResponse(**row)
+
+
+@router.delete("/{employee_id}/skills/{employee_skill_id}")
+def remove_employee_skill(
+    employee_id: int,
+    employee_skill_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(admin_only),
+) -> dict:
+    SkillService(db).remove_skill(employee_id, employee_skill_id)
+    return {"detail": "Skill removed."}
