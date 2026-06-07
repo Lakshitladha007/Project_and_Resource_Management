@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+alembic
+pymysql
+cryptography
+pydantic
+pydantic-settings
+typer
+httpx
+apscheduler
+python-jose[cryptography]
+passlib[bcrypt]
+google-generativeai
+pytest
