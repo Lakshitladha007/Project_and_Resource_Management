@@ -22,3 +22,13 @@ class AllocationRepository(BaseRepository[Allocation]):
 
     def list_active_for_employee(self, employee_id: int) -> list[Allocation]:
         return self.list_active(employee_id=employee_id)
+
+    def list_for_employee_in_period(
+        self, employee_id: int, period_start: date, period_end: date
+    ) -> list[Allocation]:
+        rows = self.list_active_for_employee(employee_id)
+        return [
+            row
+            for row in rows
+            if row.alloc_start <= period_end and row.alloc_end >= period_start
+        ]
