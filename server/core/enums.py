@@ -29,3 +29,22 @@ class ProficiencyLevel(str, Enum):
 class LLMProvider(str, Enum):
     GEMINI = "GEMINI"
     GROQ = "GROQ"
+
+
+class ProjectStatus(str, Enum):
+    PLANNED = "PLANNED"
+    ACTIVE = "ACTIVE"
+    ON_HOLD = "ON_HOLD"
+    COMPLETED = "COMPLETED"
+
+
+class HealthStatus(str, Enum):
+    ON_TRACK = "ON_TRACK"
+    ATTENTION = "ATTENTION"
+    AT_RISK = "AT_RISK"
+
+
+class MilestoneStatus(str, Enum):
+    NOT_STARTED = "NOT_STARTED"
+    IN_PROGRESS = "IN_PROGRESS"
+    DONE = "DONE"

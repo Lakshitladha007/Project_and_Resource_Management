@@ -3,6 +3,7 @@ import typer
 from client import display
 from client.screens.admin.menu import admin_menu
 from client.screens.login import login_screen
+from client.screens.manager.menu import manager_menu
 from client.session import session
 
 TITLE_LINES = [
@@ -32,6 +33,8 @@ def run() -> None:
 def _route_after_login() -> None:
     if session.role == "ADMIN":
         admin_menu()
+    elif session.role == "MANAGER":
+        manager_menu()
     else:
         display.info(f"\n{session.role} menu is coming in a later feature.")
 
