@@ -7,6 +7,11 @@ class Role(str, Enum):
     EMPLOYEE = "EMPLOYEE"
 
 
+class EmployeeStatus(str, Enum):
+    BENCH = "BENCH"
+    ALLOCATED = "ALLOCATED"
+
+
 class LLMProvider(str, Enum):
     GEMINI = "GEMINI"
     GROQ = "GROQ"

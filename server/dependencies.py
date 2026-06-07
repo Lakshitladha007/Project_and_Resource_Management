@@ -1,10 +1,10 @@
-from typing import Generator
+from typing import Callable, Generator
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from server.core.exceptions import AuthenticationError
+from server.core.exceptions import AuthenticationError, PermissionDeniedError
 from server.core.security import decode_access_token
 from server.db.database import SessionLocal
 from server.models.user import User
@@ -33,3 +33,14 @@ def get_current_user(
     if user is None:
         raise AuthenticationError("User not found")
     return user
+
+
+def require_role(*roles: str) -> Callable[..., User]:
+    def checker(current_user: User = Depends(get_current_user)) -> User:
+        if current_user.role not in roles:
+            raise PermissionDeniedError(
+                "You do not have permission to perform this action"
+            )
+        return current_user
+
+    return checker
