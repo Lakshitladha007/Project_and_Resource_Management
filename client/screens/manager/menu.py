@@ -2,9 +2,10 @@ import typer
 
 from client import display
 from client.screens.manager import allocations as allocations_screen
+from client.screens.manager import timesheets as timesheets_screen
 from client.session import session
 
-COMING_SOON = {"1", "3", "4", "5"}
+COMING_SOON = {"1", "3", "5"}
 
 
 def manager_menu() -> None:
@@ -24,6 +25,8 @@ def manager_menu() -> None:
         choice = typer.prompt("Enter option").strip()
         if choice == "2":
             allocations_screen.allocate_resource()
+        elif choice == "4":
+            timesheets_screen.view_team_timesheets()
         elif choice == "6":
             session.clear()
             display.info("Logged out.")
