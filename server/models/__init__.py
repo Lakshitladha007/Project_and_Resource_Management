@@ -4,6 +4,7 @@ from server.models.milestone import Milestone
 from server.models.project import Project
 from server.models.skill import EmployeeSkill, Skill
 from server.models.system_config import SystemConfig
+from server.models.timesheet import ActivityTag, Timesheet, TimesheetEntry, TimesheetEntryTag
 from server.models.user import User
 
 __all__ = [
@@ -15,4 +16,8 @@ __all__ = [
     "Project",
     "Milestone",
     "Allocation",
+    "Timesheet",
+    "TimesheetEntry",
+    "ActivityTag",
+    "TimesheetEntryTag",
 ]
