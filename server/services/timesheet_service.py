@@ -62,13 +62,21 @@ class TimesheetService:
             raise ValidationError("Cannot submit a timesheet for a future week")
         return week_start
 
-    def _allocation_rows_for_week(self, employee_id: int, week_start: date) -> list:
+    def _allocations_for_week(self, employee_id: int, week_start: date) -> list:
         period_end = week_end(week_start)
-        rows = self.allocations.list_for_employee_in_period(
+        return self.allocations.list_for_employee_in_period(
             employee_id, week_start, period_end
         )
+
+    def _had_allocations_in_week(self, employee_id: int, week_start: date) -> bool:
+        return bool(self._allocations_for_week(employee_id, week_start))
+
+    def _allocation_rows_for_week(self, employee_id: int, week_start: date) -> list:
+        rows = self._allocations_for_week(employee_id, week_start)
         if not rows:
-            raise ValidationError("No active allocations for the selected week")
+            raise ValidationError(
+                "You had no project allocations during this week"
+            )
         return rows
 
     def _max_hours_for_allocation(self, utilization_percent: int) -> int:
@@ -90,6 +98,8 @@ class TimesheetService:
         week_start = most_recent_completed_week_start()
         existing = self.timesheets.get_for_employee_week(employee.id, week_start)
         if existing is not None:
+            return {"show_reminder": False, "week_start": week_start}
+        if not self._had_allocations_in_week(employee.id, week_start):
             return {"show_reminder": False, "week_start": week_start}
         return {"show_reminder": True, "week_start": week_start}
 
@@ -241,6 +251,7 @@ class TimesheetService:
         start_week = end_week - timedelta(days=7 * (HISTORY_WEEKS - 1))
 
         rows: list[dict] = []
+        seen_weeks: set[date] = set()
         current = start_week
         while current <= end_week:
             if current in submitted:
@@ -252,7 +263,8 @@ class TimesheetService:
                         "status": TimesheetStatus.SUBMITTED.value,
                     }
                 )
-            else:
+                seen_weeks.add(current)
+            elif self._had_allocations_in_week(employee.id, current):
                 rows.append(
                     {
                         "week_start": current,
@@ -260,7 +272,18 @@ class TimesheetService:
                         "status": TimesheetStatus.MISSED.value,
                     }
                 )
+                seen_weeks.add(current)
             current += timedelta(days=7)
+
+        for week_start, sheet in submitted.items():
+            if week_start not in seen_weeks:
+                rows.append(
+                    {
+                        "week_start": week_start,
+                        "total_hours": sheet.total_hours,
+                        "status": TimesheetStatus.SUBMITTED.value,
+                    }
+                )
 
         rows.sort(key=lambda item: item["week_start"], reverse=True)
         return rows

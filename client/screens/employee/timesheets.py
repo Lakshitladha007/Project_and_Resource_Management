@@ -7,6 +7,18 @@ from client.api_client import ApiError, get, post
 from client.validators import format_date, parse_date
 
 
+def show_reminder() -> None:
+    try:
+        data = get("/employee/reminder")
+    except ApiError:
+        return
+    if data.get("show_reminder"):
+        week = format_date(data["week_start"])
+        display.info(
+            f"\n  Reminder: Timesheet for week {week} has not been submitted."
+        )
+
+
 def _last_monday() -> date:
     today = date.today()
     return today - timedelta(days=today.weekday())

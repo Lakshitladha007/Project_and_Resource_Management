@@ -5,18 +5,6 @@ from client.api_client import ApiError, get
 from client.validators import format_date
 
 
-def show_reminder() -> None:
-    try:
-        data = get("/employee/reminder")
-    except ApiError:
-        return
-    if data.get("show_reminder"):
-        week = format_date(data["week_start"])
-        display.info(
-            f"\n  Reminder: Timesheet for week {week} has not been submitted."
-        )
-
-
 def view_my_allocations() -> None:
     typer.echo("")
     display.banner(["MY ALLOCATIONS"])

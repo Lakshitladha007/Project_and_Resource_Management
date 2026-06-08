@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy.orm import Session
 
 from server.models.allocation import Allocation
@@ -26,9 +28,11 @@ class AllocationRepository(BaseRepository[Allocation]):
     def list_for_employee_in_period(
         self, employee_id: int, period_start: date, period_end: date
     ) -> list[Allocation]:
-        rows = self.list_active_for_employee(employee_id)
-        return [
-            row
-            for row in rows
-            if row.alloc_start <= period_end and row.alloc_end >= period_start
-        ]
+        return (
+            self.db.query(Allocation)
+            .filter(Allocation.employee_id == employee_id)
+            .filter(Allocation.alloc_start <= period_end)
+            .filter(Allocation.alloc_end >= period_start)
+            .order_by(Allocation.alloc_start)
+            .all()
+        )
