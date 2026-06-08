@@ -75,3 +75,25 @@ class EmployeeAllocationResponse(BaseModel):
 class EmployeeAllocationsListResponse(BaseModel):
     allocations: list[EmployeeAllocationResponse]
     total_utilization: int
+
+
+class TeamTimesheetRowResponse(BaseModel):
+    employee_id: int
+    employee_name: str
+    project_name: str
+    hours: int
+    status: str
+
+
+class TeamTimesheetListResponse(BaseModel):
+    week_start: date
+    rows: list[TeamTimesheetRowResponse]
+
+
+class ManagerTimesheetDetailResponse(BaseModel):
+    employee_id: int
+    employee_name: str
+    week_start: date
+    total_hours: int
+    status: str
+    entries: list[TimesheetEntryDetailResponse]
