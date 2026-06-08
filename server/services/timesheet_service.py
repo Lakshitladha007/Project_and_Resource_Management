@@ -343,3 +343,127 @@ class TimesheetService:
             "allocations": allocations,
             "total_utilization": min(total_util, 100),
         }
+
+    def _week_for_manager_view(self, week_start: date | None) -> date:
+        if week_start is None:
+            return monday_of_week(date.today())
+        week_start = monday_of_week(week_start)
+        if week_start > monday_of_week(date.today()):
+            raise ValidationError("Cannot view timesheets for a future week")
+        return week_start
+
+    def _get_team_employee(self, manager_user_id: int, employee_id: int):
+        employee = self.employees.get(employee_id)
+        if employee is None:
+            raise NotFoundError(f"No employee with id {employee_id}")
+        if employee.manager_id != manager_user_id:
+            raise PermissionDeniedError("You can only view timesheets for your team")
+        return employee
+
+    def _entry_detail_rows(self, sheet: Timesheet) -> list[dict]:
+        entries = []
+        for entry in sheet.entries:
+            project = self.projects.get(entry.project_id)
+            tag_labels = []
+            for tag in entry.tags:
+                if tag.custom_label:
+                    tag_labels.append(tag.custom_label)
+                elif tag.activity_tag_id:
+                    activity_tag = self.activity_tags.get(tag.activity_tag_id)
+                    if activity_tag:
+                        tag_labels.append(activity_tag.label)
+            entries.append(
+                {
+                    "project_id": entry.project_id,
+                    "project_name": project.name if project else str(entry.project_id),
+                    "hours": entry.hours,
+                    "activity_tags": tag_labels,
+                }
+            )
+        return entries
+
+    def list_team_timesheets(
+        self, manager_user_id: int, week_start: date | None = None
+    ) -> dict:
+        week_start = self._week_for_manager_view(week_start)
+        team = self.employees.list_by_manager(manager_user_id)
+        rows: list[dict] = []
+
+        for employee in team:
+            sheet = self.timesheets.get_with_entries(employee.id, week_start)
+            if sheet:
+                for entry in sheet.entries:
+                    project = self.projects.get(entry.project_id)
+                    rows.append(
+                        {
+                            "employee_id": employee.id,
+                            "employee_name": employee.full_name,
+                            "project_name": project.name
+                            if project
+                            else str(entry.project_id),
+                            "hours": entry.hours,
+                            "status": TimesheetStatus.SUBMITTED.value,
+                        }
+                    )
+            elif self._had_allocations_in_week(employee.id, week_start):
+                for alloc in self._allocations_for_week(employee.id, week_start):
+                    project = self.projects.get(alloc.project_id)
+                    rows.append(
+                        {
+                            "employee_id": employee.id,
+                            "employee_name": employee.full_name,
+                            "project_name": project.name
+                            if project
+                            else str(alloc.project_id),
+                            "hours": 0,
+                            "status": TimesheetStatus.MISSED.value,
+                        }
+                    )
+
+        rows.sort(key=lambda row: (row["employee_name"], row["project_name"]))
+        return {"week_start": week_start, "rows": rows}
+
+    def get_team_employee_timesheet(
+        self,
+        manager_user_id: int,
+        employee_id: int,
+        week_start: date | None = None,
+    ) -> dict:
+        employee = self._get_team_employee(manager_user_id, employee_id)
+        week_start = self._week_for_manager_view(week_start)
+        sheet = self.timesheets.get_with_entries(employee.id, week_start)
+
+        if sheet:
+            return {
+                "employee_id": employee.id,
+                "employee_name": employee.full_name,
+                "week_start": sheet.week_start,
+                "total_hours": sheet.total_hours,
+                "status": TimesheetStatus.SUBMITTED.value,
+                "entries": self._entry_detail_rows(sheet),
+            }
+
+        if self._had_allocations_in_week(employee.id, week_start):
+            entries = []
+            for alloc in self._allocations_for_week(employee.id, week_start):
+                project = self.projects.get(alloc.project_id)
+                entries.append(
+                    {
+                        "project_id": alloc.project_id,
+                        "project_name": project.name
+                        if project
+                        else str(alloc.project_id),
+                        "hours": 0,
+                        "activity_tags": [],
+                    }
+                )
+            return {
+                "employee_id": employee.id,
+                "employee_name": employee.full_name,
+                "week_start": week_start,
+                "total_hours": 0,
+                "status": TimesheetStatus.MISSED.value,
+                "entries": entries,
+            }
+
+        raise NotFoundError("No timesheet or allocations for this employee and week")
