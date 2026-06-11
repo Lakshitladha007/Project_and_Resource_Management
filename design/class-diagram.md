@@ -215,6 +215,16 @@ classDiagram
         +list_ordered() list~ActivityTag~
     }
 
+    class User
+    class Employee
+    class Project
+    class Allocation
+    class Milestone
+    class Timesheet
+    class Skill
+    class EmployeeSkill
+    class ActivityTag
+
     BaseRepository~T~ <|-- UserRepository
     BaseRepository~T~ <|-- EmployeeRepository
     BaseRepository~T~ <|-- ProjectRepository
@@ -229,7 +239,14 @@ classDiagram
     EmployeeRepository ..> Employee : persists
     ProjectRepository ..> Project : persists
     AllocationRepository ..> Allocation : persists
+    MilestoneRepository ..> Milestone : persists
+    TimesheetRepository ..> Timesheet : persists
+    SkillRepository ..> Skill : persists
+    EmployeeSkillRepository ..> EmployeeSkill : persists
+    ActivityTagRepository ..> ActivityTag : persists
 ```
+
+> **Every repository** has a `persists` link to its model. The dashed arrow means *“this class reads/writes that entity in the database”* — it is not special to `AllocationRepository`.
 
 ---
 
